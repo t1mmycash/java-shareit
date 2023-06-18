@@ -5,12 +5,12 @@ import org.springframework.stereotype.Component;
 import ru.practicum.shareit.exceptions.AccessDeniedException;
 import ru.practicum.shareit.exceptions.ItemNotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemUpdateDto;
 import ru.practicum.shareit.item.model.Item;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Component
 @Slf4j
@@ -45,19 +45,15 @@ public class ItemStorage {
         return ItemMapper.toItemDto(items.get(itemId));
     }
 
-    public ItemDto updateItem(long itemId, Map<String, Object> params) {
-        for (Map.Entry<String, Object> entry : params.entrySet()) {
-            switch (entry.getKey()) {
-                case ("name"):
-                    items.get(itemId).setName(entry.getValue().toString());
-                    break;
-                case ("description"):
-                    items.get(itemId).setDescription(entry.getValue().toString());
-                    break;
-                case ("available"):
-                    items.get(itemId).setAvailable(Boolean.parseBoolean(entry.getValue().toString()));
-                    break;
-            }
+    public ItemDto updateItem(long itemId, ItemUpdateDto changes) {
+        if (changes.getName().isPresent()) {
+            items.get(itemId).setName(changes.getName().get());
+        }
+        if (changes.getDescription().isPresent()) {
+            items.get(itemId).setDescription(changes.getDescription().get());
+        }
+        if (changes.getAvailable().isPresent()) {
+            items.get(itemId).setAvailable(changes.getAvailable().get());
         }
         return ItemMapper.toItemDto(items.get(itemId));
     }

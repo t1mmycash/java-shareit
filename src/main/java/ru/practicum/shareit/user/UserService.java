@@ -2,10 +2,9 @@ package ru.practicum.shareit.user;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
-import ru.practicum.shareit.exceptions.LackOfInformationException;
+import ru.practicum.shareit.user.dto.UserUpdateDto;
 
 import java.util.List;
-import java.util.Map;
 
 @Component
 @AllArgsConstructor
@@ -13,13 +12,6 @@ public class UserService {
     private final UserStorage userStorage;
 
     public User addUser(User user) {
-        if (user.getEmail() == null || user.getName() == null) {
-            System.out.println("до метода в сервисе дошло");
-            throw new LackOfInformationException("Заполнены не все поля");
-        }
-        if (user.getEmail().isBlank() || user.getName().isBlank()) {
-            throw new LackOfInformationException("Заполнены не все поля");
-        }
         userStorage.emailCheck(user.getEmail());
         return userStorage.addUser(user);
     }
@@ -33,9 +25,9 @@ public class UserService {
         return userStorage.getUserById(userId);
     }
 
-    public User updateUser(long userId, Map<String, Object> params) {
+    public User updateUser(long userId, UserUpdateDto changes) {
         userStorage.userExistenceCheck(userId);
-        return userStorage.updateUser(userId, params);
+        return userStorage.updateUser(userId, changes);
     }
 
     public void deleteUser(long userId) {

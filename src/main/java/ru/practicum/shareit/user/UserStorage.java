@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.practicum.shareit.exceptions.EmailAlreadyExistsException;
 import ru.practicum.shareit.exceptions.UserNotFoundException;
+import ru.practicum.shareit.user.dto.UserUpdateDto;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,17 +31,13 @@ public class UserStorage {
         return users.get(userId);
     }
 
-    public User updateUser(long userId, Map<String, Object> params) {
-        for (Map.Entry<String, Object> entry : params.entrySet()) {
-            switch (entry.getKey()) {
-                case ("email"):
-                    emailForUpdateCheck(entry.getValue().toString(), userId);
-                    users.get(userId).setEmail(entry.getValue().toString());
-                    break;
-                case ("name"):
-                    users.get(userId).setName(entry.getValue().toString());
-                    break;
-            }
+    public User updateUser(long userId, UserUpdateDto changes) {
+        if (changes.getEmail().isPresent()) {
+            emailForUpdateCheck(changes.getEmail().get(), userId);
+            users.get(userId).setEmail(changes.getEmail().get());
+        }
+        if (changes.getName().isPresent()) {
+            users.get(userId).setName(changes.getName().get());
         }
         return users.get(userId);
     }

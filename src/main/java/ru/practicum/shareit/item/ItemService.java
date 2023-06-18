@@ -1,9 +1,9 @@
 package ru.practicum.shareit.item;
 
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemUpdateDto;
 
 import java.util.List;
-import java.util.Map;
 
 public interface ItemService {
     public ItemDto addItem(ItemDto itemDto, Long userId);
@@ -12,7 +12,7 @@ public interface ItemService {
 
     public ItemDto getItemById(long itemId);
 
-    public ItemDto updateItem(Long userId, long itemId, Map<String, Object> params);
+    public ItemDto updateItem(Long userId, long itemId, ItemUpdateDto changes);
 
     public List<ItemDto> searchItem(String text);
 }
