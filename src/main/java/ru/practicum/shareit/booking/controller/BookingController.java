@@ -19,45 +19,45 @@ import java.util.List;
 @RequiredArgsConstructor
 @Validated
 public class BookingController {
-    private final String USER_ID_NOT_NULL = "id пользователя не может быть null";
-    private final String BOOKING_ID_NOT_NULL = "id аренды не может быть null";
-    private final String APPROVED_NOT_NULL = "id аренды не может быть null";
+    private final String userIdNotNull = "id пользователя не может быть null";
+    private final String bookingIdNotNull = "id аренды не может быть null";
+    private final String approvedNotNull = "id аренды не может быть null";
 
 
     private final BookingService bookingService;
 
     @PostMapping
     public BookingResultDto addBooking(
-            @RequestHeader("X-Sharer-User-Id") @NotNull(message = USER_ID_NOT_NULL) Long bookerId,
+            @RequestHeader("X-Sharer-User-Id") @NotNull(message = userIdNotNull) Long bookerId,
             @RequestBody @Valid BookingDto booking) {
         return bookingService.addBooking(bookerId, booking);
     }
 
     @PatchMapping("/{bookingId}")
     public BookingResultDto updateBookingStatus(
-            @RequestHeader(value = "X-Sharer-User-Id") @NotNull(message = USER_ID_NOT_NULL) Long ownerId,
-            @PathVariable(value = "bookingId") @NotNull(message = BOOKING_ID_NOT_NULL) Long bookingId,
-            @RequestParam(name = "approved") @NotNull(message = APPROVED_NOT_NULL) Boolean approved) {
+            @RequestHeader(value = "X-Sharer-User-Id") @NotNull(message = userIdNotNull) Long ownerId,
+            @PathVariable(value = "bookingId") @NotNull(message = bookingIdNotNull) Long bookingId,
+            @RequestParam(name = "approved") @NotNull(message = approvedNotNull) Boolean approved) {
         return bookingService.updateBookingStatus(ownerId, bookingId, approved);
     }
 
     @GetMapping("/{bookingId}")
     public BookingResultDto getBooking(
-            @RequestHeader(value = "X-Sharer-User-Id") @NotNull(message = USER_ID_NOT_NULL) Long userId,
-            @PathVariable(value = "bookingId") @NotNull(message = BOOKING_ID_NOT_NULL) Long bookingId) {
+            @RequestHeader(value = "X-Sharer-User-Id") @NotNull(message = userIdNotNull) Long userId,
+            @PathVariable(value = "bookingId") @NotNull(message = bookingIdNotNull) Long bookingId) {
         return bookingService.getBooking(userId, bookingId);
     }
 
     @GetMapping
     public List<BookingResultDto> getAllUserBookings(
-            @RequestHeader(value = "X-Sharer-User-Id") @NotNull(message = USER_ID_NOT_NULL) Long userId,
+            @RequestHeader(value = "X-Sharer-User-Id") @NotNull(message = userIdNotNull) Long userId,
             @RequestParam(value = "state", defaultValue = "ALL") String sort) {
         return bookingService.getAllUserBookings(userId, sort);
     }
 
     @GetMapping("/owner")
     public List<BookingResultDto> getAllUserBookedItemsBookings(
-            @RequestHeader(value = "X-Sharer-User-Id") @NotNull(message = USER_ID_NOT_NULL) Long ownerId,
+            @RequestHeader(value = "X-Sharer-User-Id") @NotNull(message = userIdNotNull) Long ownerId,
             @RequestParam(value = "state", defaultValue = "ALL") String sort) {
         return bookingService.getAllUserBookedItemsBookings(ownerId, sort);
     }
