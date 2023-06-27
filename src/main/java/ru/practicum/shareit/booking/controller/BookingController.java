@@ -19,9 +19,9 @@ import java.util.List;
 @RequiredArgsConstructor
 @Validated
 public class BookingController {
-    private final static String USER_ID_NOT_NULL = "id пользователя не может быть null";
-    private final static String BOOKING_ID_NOT_NULL = "id аренды не может быть null";
-    private final static String APPROVED_NOT_NULL = "id аренды не может быть null";
+    private final String USER_ID_NOT_NULL = "id пользователя не может быть null";
+    private final String BOOKING_ID_NOT_NULL = "id аренды не может быть null";
+    private final String APPROVED_NOT_NULL = "id аренды не может быть null";
 
 
     private final BookingService bookingService;

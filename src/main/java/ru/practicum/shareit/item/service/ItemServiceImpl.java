@@ -76,8 +76,8 @@ public class ItemServiceImpl implements ItemService {
         List<ItemGetResponseDto> result = new ArrayList<>();
         for (ItemDto itemDto : items) {
             List<BookingInItemDto> itemBookings = bookingRepository.findAllItemBookingsByItemId(itemDto.getId(), BookingStatus.APPROVED);
-            result.add(ItemMapper.toItemWithBookingsDto
-                    (itemDto, findLastBookingOfItem(itemBookings), findNextBookingOfItem(itemBookings), findCommentsOfItem(itemDto.getId())));
+            result.add(ItemMapper.toItemWithBookingsDto(
+                    itemDto, findLastBookingOfItem(itemBookings), findNextBookingOfItem(itemBookings), findCommentsOfItem(itemDto.getId())));
         }
         return result;
     }
@@ -88,8 +88,8 @@ public class ItemServiceImpl implements ItemService {
         ItemDto itemDto = ItemMapper.toItemDto(item);
         if (userId == item.getOwner().getId()) {
             List<BookingInItemDto> itemBookings = bookingRepository.findAllItemBookingsByItemId(itemId, BookingStatus.APPROVED);
-            return ItemMapper.toItemWithBookingsDto
-                    (itemDto, findLastBookingOfItem(itemBookings), findNextBookingOfItem(itemBookings), findCommentsOfItem(itemId));
+            return ItemMapper.toItemWithBookingsDto(
+                    itemDto, findLastBookingOfItem(itemBookings), findNextBookingOfItem(itemBookings), findCommentsOfItem(itemId));
         } else {
             return ItemMapper.toItemWithBookingsDto(itemDto, null, null, findCommentsOfItem(itemId));
         }

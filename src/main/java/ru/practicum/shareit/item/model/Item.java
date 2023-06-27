@@ -5,12 +5,7 @@ import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 
-/**
- * TODO Sprint add-controllers.
- */
 @Entity
 @Table(name = "items")
 @Data

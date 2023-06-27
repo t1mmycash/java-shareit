@@ -18,8 +18,8 @@ public class ItemMapper {
         );
     }
 
-    public static ItemGetResponseDto toItemWithBookingsDto
-            (ItemDto item, BookingInItemDto lastBooking, BookingInItemDto nextBooking, List<CommentResponseDto> comments) {
+    public static ItemGetResponseDto toItemWithBookingsDto(
+            ItemDto item, BookingInItemDto lastBooking, BookingInItemDto nextBooking, List<CommentResponseDto> comments) {
         return new ItemGetResponseDto(
                 item.getId(),
                 item.getName(),

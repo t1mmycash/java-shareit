@@ -19,9 +19,9 @@ import java.util.List;
 @AllArgsConstructor
 @Validated
 public class ItemController {
-    private final static String USER_ID_NOT_NULL = "id пользователя не может быть null";
-    private final static String ITEM_ID_NOT_NULL = "id вещи не может быть null";
-    private final static String TEXT_NOT_NULL = "текст не может быть null";
+    private final String USER_ID_NOT_NULL = "id пользователя не может быть null";
+    private final String ITEM_ID_NOT_NULL = "id вещи не может быть null";
+    private final String TEXT_NOT_NULL = "текст не может быть null";
     private final ItemService itemService;
 
     @PostMapping

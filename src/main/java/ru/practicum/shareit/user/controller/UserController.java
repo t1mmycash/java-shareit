@@ -16,7 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 @Validated
 public class UserController {
-    private final static String USER_ID_NOT_NULL = "id пользователя не может быть null";
+    private final String USER_ID_NOT_NULL = "id пользователя не может быть null";
     private final UserService userService;
 
     @PostMapping
