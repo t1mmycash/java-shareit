@@ -16,7 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 @Validated
 public class UserController {
-    private final String userIdNotNull = "id пользователя не может быть null";
+    private static final String USER_ID_NOT_NULL = "id пользователя не может быть null";
     private final UserService userService;
 
     @PostMapping
@@ -26,7 +26,7 @@ public class UserController {
 
     @PatchMapping("/{userId}")
     public User updateUser(
-            @PathVariable(value = "userId") @NotNull(message = userIdNotNull) Long userId,
+            @PathVariable(value = "userId") @NotNull(message = USER_ID_NOT_NULL) Long userId,
             @RequestBody @Valid UserUpdateDto changes) {
         return userService.updateUser(userId, changes);
     }
@@ -38,13 +38,13 @@ public class UserController {
 
     @GetMapping("/{userId}")
     public User getUserById(
-            @PathVariable(value = "userId") @NotNull(message = userIdNotNull) Long userId) {
+            @PathVariable(value = "userId") @NotNull(message = USER_ID_NOT_NULL) Long userId) {
         return userService.getUserById(userId);
     }
 
     @DeleteMapping("/{userId}")
     public void deleteUser(
-            @PathVariable(value = "userId") @NotNull(message = userIdNotNull) Long userId) {
+            @PathVariable(value = "userId") @NotNull(message = USER_ID_NOT_NULL) Long userId) {
         userService.deleteUser(userId);
     }
 
