@@ -883,8 +883,8 @@ class BookingServiceImplTest {
 
         assertEquals(mappedBookings, result);
         verify(userRepository, times(1)).existsById(1L);
-        verify(bookingRepository, times(1)).
-                findFutureUserItemsBookingsByOwnerId(1L, PageRequest.of(0, 20, sort));
+        verify(bookingRepository, times(1))
+                .findFutureUserItemsBookingsByOwnerId(1L, PageRequest.of(0, 20, sort));
         verify(bookingMapper, times(1)).toBookingResultDtoList(bookings);
         verifyNoMoreInteractions(userRepository, bookingRepository, bookingMapper);
         verifyNoInteractions(itemRepository);

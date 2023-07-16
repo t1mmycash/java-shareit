@@ -38,8 +38,8 @@ class UserControllerIT {
                 .build();
         when(userService.addUser(user)).thenReturn(user);
 
-        String result = mvc.perform(post("/users").
-                        content(mapper.writeValueAsString(user))
+        String result = mvc.perform(post("/users")
+                        .content(mapper.writeValueAsString(user))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
