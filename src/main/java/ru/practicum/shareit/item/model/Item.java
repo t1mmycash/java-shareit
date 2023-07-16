@@ -18,7 +18,7 @@ public class Item {
     private long id;
     private String name;
     private String description;
-    private boolean available;
+    private Boolean available;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id")
     private User owner;
