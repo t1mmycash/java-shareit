@@ -1,10 +1,13 @@
 package ru.practicum.shareit.booking.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.Sort;
 import ru.practicum.shareit.booking.BookingMapper;
 import ru.practicum.shareit.booking.BookingStatus;
-import ru.practicum.shareit.booking.Sort;
+import ru.practicum.shareit.booking.SortType;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingResultDto;
 import ru.practicum.shareit.booking.model.Booking;
@@ -19,10 +22,12 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
+    private final BookingMapper bookingMapper;
 
     @Override
     public BookingResultDto addBooking(long bookerId, BookingDto booking) {
@@ -31,7 +36,7 @@ public class BookingServiceImpl implements BookingService {
         if (bookerId == item.getOwner().getId()) {
             throw new AccessDeniedException("Пользователь не может забронировать свою же вещь");
         }
-        if (!item.isAvailable()) {
+        if (!item.getAvailable()) {
             throw new ItemIsNotAvailableException(String.format("Вещь с id = %d недоступна", item.getId()));
         }
         if (booking.getStart().equals(booking.getEnd())) {
@@ -40,7 +45,7 @@ public class BookingServiceImpl implements BookingService {
         if (booking.getStart().isAfter(booking.getEnd())) {
             throw new WrongBookingTimeException("Время конца бронирования не может быть раньше его начала");
         }
-        return BookingMapper.toBookingResultDto(bookingRepository.save(Booking.builder()
+        return bookingMapper.toBookingResultDto(bookingRepository.save(Booking.builder()
                 .start(booking.getStart())
                 .end(booking.getEnd())
                 .item(item)
@@ -67,75 +72,81 @@ public class BookingServiceImpl implements BookingService {
         } else {
             booking.setStatus(BookingStatus.REJECTED);
         }
-        return BookingMapper.toBookingResultDto(bookingRepository.save(booking));
+        return bookingMapper.toBookingResultDto(bookingRepository.save(booking));
     }
 
     @Override
+    @Transactional(readOnly = true)
     public BookingResultDto getBooking(long userId, long bookingId) {
+        userExistenceCheck(userId);
         Booking booking = bookingRepository.findById(bookingId).orElseThrow(() ->
                 new BookingNotFoundException(String.format("Бронирования с id = %d не существует", bookingId)));
         if (userId != booking.getBooker().getId() && userId != booking.getItem().getOwner().getId()) {
             throw new AccessDeniedException(
                     String.format("У пользователя с id = %d нет доступа к бронированию с id = %d", userId, bookingId));
         }
-        return BookingMapper.toBookingResultDto(booking);
+        return bookingMapper.toBookingResultDto(booking);
     }
 
     @Override
-    public List<BookingResultDto> getAllUserBookings(long userId, String sort) {
+    @Transactional(readOnly = true)
+    public List<BookingResultDto> getAllUserBookings(long userId, String sort, int from, int size) {
         userExistenceCheck(userId);
-        sortValidNameCheck(sort);
-        switch (Sort.valueOf(sort)) {
+        PageRequest pageRequest = createPageRequest(from, size);
+        switch (sortValidNameCheck(sort)) {
             case ALL:
-                return BookingMapper.toBookingResultDtoList(
-                        bookingRepository.findAllBookingsByBookerId(userId));
+                return bookingMapper.toBookingResultDtoList(
+                        bookingRepository.findAllBookingsByBookerId(userId, pageRequest));
             case PAST:
-                return BookingMapper.toBookingResultDtoList(
-                        bookingRepository.findPastBookingsByBookerId(userId));
+                return bookingMapper.toBookingResultDtoList(
+                        bookingRepository.findPastBookingsByBookerId(userId, pageRequest));
             case CURRENT:
-                return BookingMapper.toBookingResultDtoList(
-                        bookingRepository.findCurrentBookingsByBookerId(userId));
+                return bookingMapper.toBookingResultDtoList(
+                        bookingRepository.findCurrentBookingsByBookerId(userId, pageRequest));
             case FUTURE:
-                return BookingMapper.toBookingResultDtoList(
-                        bookingRepository.findFutureBookingsByBookerId(userId));
+                return bookingMapper.toBookingResultDtoList(
+                        bookingRepository.findFutureBookingsByBookerId(userId, pageRequest));
             case WAITING:
             case REJECTED:
-                return BookingMapper.toBookingResultDtoList(
-                        bookingRepository.findAllBookingsByBookerIdAndStatus(userId, BookingStatus.valueOf(sort)));
+                return bookingMapper.toBookingResultDtoList(
+                        bookingRepository.findAllBookingsByBookerIdAndStatus(
+                                userId, BookingStatus.valueOf(sort), pageRequest));
             default:
                 throw new InvalidSortTypeException(String.format("Unknown state: %s", sort));
         }
     }
 
     @Override
-    public List<BookingResultDto> getAllUserBookedItemsBookings(long ownerId, String sort) {
+    @Transactional(readOnly = true)
+    public List<BookingResultDto> getAllUserBookedItemsBookings(long ownerId, String sort, int from, int size) {
         userExistenceCheck(ownerId);
-        sortValidNameCheck(sort);
-        switch (Sort.valueOf(sort)) {
+        PageRequest pageRequest = createPageRequest(from, size);
+        switch (sortValidNameCheck(sort)) {
             case ALL:
-                return BookingMapper.toBookingResultDtoList(
-                        bookingRepository.findAllUserItemsBookingsByOwnerId(ownerId));
+                return bookingMapper.toBookingResultDtoList(
+                        bookingRepository.findAllUserItemsBookingsByOwnerId(ownerId, pageRequest));
             case PAST:
-                return BookingMapper.toBookingResultDtoList(
-                        bookingRepository.findPastUserItemsBookingsByOwnerId(ownerId));
+                return bookingMapper.toBookingResultDtoList(
+                        bookingRepository.findPastUserItemsBookingsByOwnerId(ownerId, pageRequest));
             case CURRENT:
-                return BookingMapper.toBookingResultDtoList(
-                        bookingRepository.findCurrentUserItemsBookingsByOwnerId(ownerId));
+                return bookingMapper.toBookingResultDtoList(
+                        bookingRepository.findCurrentUserItemsBookingsByOwnerId(ownerId, pageRequest));
             case FUTURE:
-                return BookingMapper.toBookingResultDtoList(
-                        bookingRepository.findFutureUserItemsBookingsByOwnerId(ownerId));
+                return bookingMapper.toBookingResultDtoList(
+                        bookingRepository.findFutureUserItemsBookingsByOwnerId(ownerId, pageRequest));
             case WAITING:
             case REJECTED:
-                return BookingMapper.toBookingResultDtoList(
-                        bookingRepository.findAllUserItemsBookingsByOwnerIdAndStatus(ownerId, BookingStatus.valueOf(sort)));
+                return bookingMapper.toBookingResultDtoList(
+                        bookingRepository.findAllUserItemsBookingsByOwnerIdAndStatus(
+                                ownerId, BookingStatus.valueOf(sort), pageRequest));
             default:
                 throw new InvalidSortTypeException(String.format("Unknown state: %s", sort));
         }
     }
 
-    private void sortValidNameCheck(String sort) {
+    private SortType sortValidNameCheck(String sort) {
         try {
-            Sort.valueOf(sort);
+            return SortType.valueOf(sort);
         } catch (IllegalArgumentException e) {
             throw new InvalidSortTypeException(String.format("Unknown state: %s", sort));
         }
@@ -156,6 +167,17 @@ public class BookingServiceImpl implements BookingService {
         return userRepository.findById(userId).orElseThrow(
                 () -> new UserNotFoundException(
                         String.format("Пользователя с id = %d не существует", userId)));
+    }
+
+    private PageRequest createPageRequest(int from, int size) {
+        PageRequest pageRequest;
+        Sort sort = Sort.by(Sort.Direction.DESC, "start");
+        if (from == 0) {
+            pageRequest = PageRequest.of(from, size, sort);
+        } else {
+            pageRequest = PageRequest.of(from / size, size, sort);
+        }
+        return pageRequest;
     }
 
 }

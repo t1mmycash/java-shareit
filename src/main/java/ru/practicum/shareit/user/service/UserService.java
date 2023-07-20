@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exceptions.EmailAlreadyExistsException;
 import ru.practicum.shareit.exceptions.UserNotFoundException;
 import ru.practicum.shareit.user.repository.UserRepository;
@@ -14,22 +15,25 @@ import java.util.List;
 
 @Component
 @AllArgsConstructor
+@Transactional
 public class UserService {
     private final UserRepository userRepository;
 
     public User addUser(User user) {
         try {
-            return userRepository.save(user);
+            return userRepository.saveAndFlush(user);
         } catch (DataIntegrityViolationException e) {
             throw new EmailAlreadyExistsException(
                     String.format("Уже существует пользователь с email - %s", user.getEmail()));
         }
     }
 
+    @Transactional(readOnly = true)
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
 
+    @Transactional(readOnly = true)
     public User getUserById(long userId) {
         return userRepository.findById(userId).orElseThrow(
                 () -> new UserNotFoundException(
@@ -45,7 +49,7 @@ public class UserService {
             user.setName(changes.getName().get());
         }
         try {
-            return userRepository.save(user);
+            return userRepository.saveAndFlush(user);
         } catch (DataIntegrityViolationException e) {
             throw new EmailAlreadyExistsException(
                     String.format("Уже существует пользователь с email - %s", user.getEmail()));

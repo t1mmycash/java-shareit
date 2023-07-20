@@ -8,7 +8,6 @@ import ru.practicum.shareit.user.dto.UserUpdateDto;
 import ru.practicum.shareit.user.model.User;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @RestController
@@ -16,7 +15,6 @@ import java.util.List;
 @AllArgsConstructor
 @Validated
 public class UserController {
-    private static final String USER_ID_NOT_NULL = "id пользователя не может быть null";
     private final UserService userService;
 
     @PostMapping
@@ -26,7 +24,7 @@ public class UserController {
 
     @PatchMapping("/{userId}")
     public User updateUser(
-            @PathVariable(value = "userId") @NotNull(message = USER_ID_NOT_NULL) Long userId,
+            @PathVariable(value = "userId") long userId,
             @RequestBody @Valid UserUpdateDto changes) {
         return userService.updateUser(userId, changes);
     }
@@ -38,13 +36,13 @@ public class UserController {
 
     @GetMapping("/{userId}")
     public User getUserById(
-            @PathVariable(value = "userId") @NotNull(message = USER_ID_NOT_NULL) Long userId) {
+            @PathVariable(value = "userId") long userId) {
         return userService.getUserById(userId);
     }
 
     @DeleteMapping("/{userId}")
     public void deleteUser(
-            @PathVariable(value = "userId") @NotNull(message = USER_ID_NOT_NULL) Long userId) {
+            @PathVariable(value = "userId") long userId) {
         userService.deleteUser(userId);
     }
 

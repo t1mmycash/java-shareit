@@ -1,6 +1,6 @@
 package ru.practicum.shareit.booking;
 
-public enum Sort {
+public enum SortType {
     ALL,
     CURRENT,
     PAST,

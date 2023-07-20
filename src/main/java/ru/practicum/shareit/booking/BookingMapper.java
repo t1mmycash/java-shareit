@@ -1,5 +1,7 @@
 package ru.practicum.shareit.booking;
 
+import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Component;
 import ru.practicum.shareit.booking.dto.BookingResultDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.item.ItemMapper;
@@ -9,21 +11,26 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Component
+@AllArgsConstructor
 public class BookingMapper {
-    public static BookingResultDto toBookingResultDto(Booking booking) {
+    private final ItemMapper itemMapper;
+    private final UserMapper userMapper;
+
+    public BookingResultDto toBookingResultDto(Booking booking) {
         return new BookingResultDto(
                 booking.getId(),
                 booking.getStart(),
                 booking.getEnd(),
                 booking.getStatus(),
-                UserMapper.toUserResultDto(booking.getBooker()),
-                ItemMapper.toItemDto(booking.getItem())
+                userMapper.toUserResultDto(booking.getBooker()),
+                itemMapper.toItemDto(booking.getItem())
         );
     }
 
-    public static List<BookingResultDto> toBookingResultDtoList(Collection<Booking> bookings) {
+    public List<BookingResultDto> toBookingResultDtoList(Collection<Booking> bookings) {
         return bookings.stream()
-                .map(BookingMapper::toBookingResultDto)
+                .map(this::toBookingResultDto)
                 .collect(Collectors.toList());
     }
 }
