@@ -17,12 +17,4 @@ public class ItemUpdateDto {
     public Optional<String> getName() {
         return Optional.ofNullable(name);
     }
-
-    public Optional<String> getDescription() {
-        return Optional.ofNullable(description);
-    }
-
-    public Optional<Boolean> getAvailable() {
-        return Optional.ofNullable(available);
-    }
 }
