@@ -14,7 +14,7 @@ import java.util.Optional;
 @Repository
 public interface ItemRepository extends JpaRepository<Item, Long> {
     @Query("select new ru.practicum.shareit.item.dto.ItemDto(it.id, it.name, it.description, it.available) " +
-            "from Item as it where it.owner.id = ?1")
+            "from Item as it where it.owner.id = ?1 order by it.id asc")
     List<ItemDto> findItemsByOwnerId(Long ownerId, PageRequest pageRequest);
 
     <T> Optional<T> findItemById(Long itemId, Class<T> type);

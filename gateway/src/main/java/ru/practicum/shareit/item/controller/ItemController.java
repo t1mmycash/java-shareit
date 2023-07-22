@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.CommentPostDto;
 import ru.practicum.shareit.item.dto.ItemPostDto;
@@ -19,6 +20,7 @@ import static ru.practicum.shareit.util.Constant.*;
 
 @RestController
 @Slf4j
+@Validated
 @RequestMapping("/items")
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class ItemController {
