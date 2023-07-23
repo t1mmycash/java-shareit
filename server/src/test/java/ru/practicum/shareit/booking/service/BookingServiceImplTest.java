@@ -185,67 +185,6 @@ class BookingServiceImplTest {
     }
 
     @Test
-    void addBooking_whenStartAndEndAreEquals_thenExceptionWillBeThrown() {
-        LocalDateTime now = LocalDateTime.now();
-        BookingDto bookingDto = BookingDto.builder()
-                .itemId(1L)
-                .start(now)
-                .end(now)
-                .build();
-        User booker = User.builder()
-                .id(1L)
-                .build();
-        Item item = Item.builder()
-                .id(1L)
-                .available(true)
-                .owner(User.builder()
-                        .id(2L)
-                        .build())
-                .build();
-        when(userRepository.findById(1L)).thenReturn(Optional.of(booker));
-        when(itemRepository.findItemById(1L, Item.class)).thenReturn(Optional.of(item));
-
-        WrongBookingTimeException e = assertThrows(
-                WrongBookingTimeException.class, () -> bookingService.addBooking(1L, bookingDto));
-
-        assertEquals("Время начала и конца бронирования не может совпадать", e.getMessage());
-        verify(userRepository, times(1)).findById(1L);
-        verify(itemRepository, times(1)).findItemById(1L, Item.class);
-        verifyNoMoreInteractions(userRepository, itemRepository);
-        verifyNoInteractions(bookingRepository, bookingMapper);
-    }
-
-    @Test
-    void addBooking_whenStartAfterEnd_thenExceptionWillBeThrown() {
-        BookingDto bookingDto = BookingDto.builder()
-                .itemId(1L)
-                .start(LocalDateTime.now().plusHours(10))
-                .end(LocalDateTime.now().plusHours(5))
-                .build();
-        User booker = User.builder()
-                .id(1L)
-                .build();
-        Item item = Item.builder()
-                .id(1L)
-                .available(true)
-                .owner(User.builder()
-                        .id(2L)
-                        .build())
-                .build();
-        when(userRepository.findById(1L)).thenReturn(Optional.of(booker));
-        when(itemRepository.findItemById(1L, Item.class)).thenReturn(Optional.of(item));
-
-        WrongBookingTimeException e = assertThrows(
-                WrongBookingTimeException.class, () -> bookingService.addBooking(1L, bookingDto));
-
-        assertEquals("Время конца бронирования не может быть раньше его начала", e.getMessage());
-        verify(userRepository, times(1)).findById(1L);
-        verify(itemRepository, times(1)).findItemById(1L, Item.class);
-        verifyNoMoreInteractions(userRepository, itemRepository);
-        verifyNoInteractions(bookingRepository, bookingMapper);
-    }
-
-    @Test
     void updateBookingStatus_whenInvokedWithApproved_thenReturnUpdatedBookingResultDto() {
         Item item = Item.builder()
                 .owner(User.builder()
@@ -741,20 +680,6 @@ class BookingServiceImplTest {
     }
 
     @Test
-    void getAllUserBookings_whenInvalidSortType_thenExceptionWillBeThrown() {
-        when(userRepository.existsById(1L)).thenReturn(true);
-
-        InvalidSortTypeException e = assertThrows(
-                InvalidSortTypeException.class, () -> bookingService
-                        .getAllUserBookings(1L, "INVALID", 0, 20));
-
-        assertEquals("Unknown state: INVALID", e.getMessage());
-        verify(userRepository, times(1)).existsById(1L);
-        verifyNoMoreInteractions(userRepository);
-        verifyNoInteractions(bookingRepository, bookingMapper, itemRepository);
-    }
-
-    @Test
     void getAllUserBookedItemsBookings_whenInvokedWithSortTypeAll_thenReturnBookingResultDtoList() {
         List<Booking> bookings = List.of(
                 Booking.builder()
@@ -975,17 +900,4 @@ class BookingServiceImplTest {
         verifyNoInteractions(bookingRepository, bookingMapper, itemRepository);
     }
 
-    @Test
-    void getAllUserBookedItemsBookings_whenInvalidSortType_thenExceptionWillBeThrown() {
-        when(userRepository.existsById(1L)).thenReturn(true);
-
-        InvalidSortTypeException e = assertThrows(
-                InvalidSortTypeException.class, () -> bookingService
-                        .getAllUserBookedItemsBookings(1L, "INVALID", 0, 20));
-
-        assertEquals("Unknown state: INVALID", e.getMessage());
-        verify(userRepository, times(1)).existsById(1L);
-        verifyNoMoreInteractions(userRepository);
-        verifyNoInteractions(bookingRepository, bookingMapper, itemRepository);
-    }
 }
