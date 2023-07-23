@@ -39,12 +39,6 @@ public class BookingServiceImpl implements BookingService {
         if (!item.getAvailable()) {
             throw new ItemIsNotAvailableException(String.format("Вещь с id = %d недоступна", item.getId()));
         }
-        if (booking.getStart().equals(booking.getEnd())) {
-            throw new WrongBookingTimeException("Время начала и конца бронирования не может совпадать");
-        }
-        if (booking.getStart().isAfter(booking.getEnd())) {
-            throw new WrongBookingTimeException("Время конца бронирования не может быть раньше его начала");
-        }
         return bookingMapper.toBookingResultDto(bookingRepository.save(Booking.builder()
                 .start(booking.getStart())
                 .end(booking.getEnd())
@@ -93,7 +87,7 @@ public class BookingServiceImpl implements BookingService {
     public List<BookingResultDto> getAllUserBookings(long userId, String sort, int from, int size) {
         userExistenceCheck(userId);
         PageRequest pageRequest = createPageRequest(from, size);
-        switch (sortValidNameCheck(sort)) {
+        switch (SortType.valueOf(sort)) {
             case ALL:
                 return bookingMapper.toBookingResultDtoList(
                         bookingRepository.findAllBookingsByBookerId(userId, pageRequest));
@@ -121,7 +115,7 @@ public class BookingServiceImpl implements BookingService {
     public List<BookingResultDto> getAllUserBookedItemsBookings(long ownerId, String sort, int from, int size) {
         userExistenceCheck(ownerId);
         PageRequest pageRequest = createPageRequest(from, size);
-        switch (sortValidNameCheck(sort)) {
+        switch (SortType.valueOf(sort)) {
             case ALL:
                 return bookingMapper.toBookingResultDtoList(
                         bookingRepository.findAllUserItemsBookingsByOwnerId(ownerId, pageRequest));
@@ -141,14 +135,6 @@ public class BookingServiceImpl implements BookingService {
                                 ownerId, BookingStatus.valueOf(sort), pageRequest));
             default:
                 throw new InvalidSortTypeException(String.format("Unknown state: %s", sort));
-        }
-    }
-
-    private SortType sortValidNameCheck(String sort) {
-        try {
-            return SortType.valueOf(sort);
-        } catch (IllegalArgumentException e) {
-            throw new InvalidSortTypeException(String.format("Unknown state: %s", sort));
         }
     }
 

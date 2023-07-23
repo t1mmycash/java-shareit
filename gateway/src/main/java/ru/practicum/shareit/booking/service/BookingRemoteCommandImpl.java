@@ -9,6 +9,7 @@ import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.client.BaseClient;
 
+import javax.validation.ValidationException;
 import java.util.Map;
 
 @Service
@@ -26,6 +27,12 @@ public class BookingRemoteCommandImpl extends BaseClient implements BookingRemot
 
     @Override
     public ResponseEntity<Object> addBooking(Long userId, BookingDto bookingDto) {
+        if (bookingDto.getStart().equals(bookingDto.getEnd())) {
+            throw new ValidationException("Время начала и конца бронирования не может совпадать");
+        }
+        if (bookingDto.getStart().isAfter(bookingDto.getEnd())) {
+            throw new ValidationException("Время конца бронирования не может быть раньше его начала");
+        }
         return post("", userId, bookingDto);
     }
 
