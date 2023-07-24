@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.Email;
 import java.util.Optional;
 
 @NoArgsConstructor
@@ -14,7 +13,6 @@ import java.util.Optional;
 @Data
 public class UserUpdateDto {
     private String name;
-    @Email
     private String email;
 
     public Optional<String> getName() {
